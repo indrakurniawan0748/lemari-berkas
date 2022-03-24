@@ -12,6 +12,8 @@ date_default_timezone_set('Asia/Jakarta');
     <link href="asset/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="asset/font/themify-icons.css">
     <script src="asset/js/jquery-3.1.1.min.js"></script>
+    <script src="asset/js/popper.min.js"></script>
+    <script src="asset/js/bootstrap.min.js"></script>
     <title>E-Document | Citra Bangsa School</title>
     
     <style>
@@ -319,8 +321,7 @@ date_default_timezone_set('Asia/Jakarta');
   </div>
 </div>
 
-<script src="asset/js/popper.min.js"></script>
-<script src="asset/js/bootstrap.min.js"></script>
+
 
 
 <script>
@@ -333,7 +334,7 @@ $(document).ready(function(){
 
     $('#upload').on('click', function(){
         var hal = $(this).attr('id');
-        $('#dokumenSiswa').modal('show');
+        $('#uploadDokumen').modal('show');
         return false;
     });
     $('#edit_cat').on('click', function(){
@@ -352,26 +353,100 @@ $(document).ready(function(){
 
 
 
-<!-- ========================== BAGAN MODAL==================================== -->
+<!-- ========================== BAGAN MODAL UPLOAD DOCUMENT ==================================== -->
 <!-- Modal -->
-<div class="modal fade" id="dokumenSiswa" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Upload Dokumen Siswa</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        bagian body halaman
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Understood</button>
-      </div>
+<div class="modal fade" id="uploadDokumen" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Upload Document</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+            <form id="fupForm" enctype="multipart/form-data">
+            <div class="modal-body">
+            
+                <div class="container">
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <select class="form-select form-select-sm mb-3" aria-label=".form-select-sm example" required>
+                                <option disabled selected>Category</option>
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <select class="form-select form-select-sm mb-3" aria-label=".form-select-sm example" required>
+                                <option disabled selected>Sub Category</option>
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label for="exampleFormControlInput1" class="form-label">Nama File</label>
+                            <input type="text" class="form-control form-control-sm" id="exampleFormControlInput1" placeholder="Contoh: " required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label for="formFileSm" class="form-label">Pilih File, Max 2Mb:</label>
+                            <input class="form-control form-control-sm" id="formFileSm" type="file" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">CLOSE</button>
+                <button type="submit" name="submit" class="btn btn-primary btn-sm submitBtn" value="submit">SAVE</button>
+            </div>
+            </form>
+        </div>
     </div>
-  </div>
 </div>
 
 
 </body>
 </html>
+
+<script>
+    $(document).ready(function(e){  
+        $("#fupForm").on('submit',function(e){
+            e.preventDefault();
+            $.ajax({
+                type:'POST',
+                url:'proses.php',
+                data:new FormData(this),
+                dataType:'json',
+                contentType:false,
+                cache:false,
+                processData:false,
+                beforeSend:function(){
+                    $('.submitBtn').attr("disabled","disabled");
+                    $('#fupForm').css("opacity","5");
+                },
+                success:function(response){
+                    $('.statusMsg').html('');
+                    if(response.status == 1){
+                        $('#fupForm').[0].reset();
+                        $('.statusMsg').html('<p class="alert alert-success">'+reponse.message+'</p>');
+                    }else{
+                        $('.statusMsg').html('<p class="alert alert-danger">'+reponse.message+'</p>');
+                    }
+                    $('#fupForm').css("opacity","");
+                    $(".submitBtn").removeAttr("disabled");
+                }
+            });
+        });
+
+        // file type validation
+        $("#file").change(function(){
+            var file = this.files[0];
+            var imagefile = file.type;
+            var match = ['application/pdf','image/png','image/jpg','image/jpeg'];
+            if(!((imagefile==match[0]) || (imagefile==match[1]) || (imagefile==match[2]) || (imagefile==match[3]))){
+                alert('Sorry Only PDF, PNG, JPG and JPEG files are allowed to upload.');
+                $("#file").var('');
+                return false;
+            }
+        });
+    });
+</script>

@@ -74,7 +74,7 @@ $(document).ready(function(){
     
     });
     $("body , #upload").click(function(){
-    document.getElementById("context-menu").classList.remove("active");
+        document.getElementById("context-menu").classList.remove("active");
     });
     
 });
